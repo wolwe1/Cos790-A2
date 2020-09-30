@@ -1,13 +1,17 @@
 package u17112631;
 
+import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
+import u17112631.dto.constraints.hardConstraints.period.PeriodHardConstraint;
+import u17112631.dto.primitives.ExamProblemSet;
+import u17112631.helpers.ExamFileReader;
+import u17112631.infrastructure.SinglePointSelectionPerturbativeSearch;
 import u17112631.infrastructure.heuristics.PeriodSwapHeuristic;
 import u17112631.infrastructure.heuristics.RoomSwapHeuristic;
-import u17112631.infrastructure.implementation.FirstFitCreator;
-import u17112631.infrastructure.implementation.RandomHeuristicSelector;
+import u17112631.infrastructure.implementation.*;
 import u17112631.infrastructure.interfaces.IHeuristicSelecter;
 import u17112631.infrastructure.heuristics.PerturbativeHeuristic;
+import u17112631.infrastructure.interfaces.IMoveAccepter;
 import u17112631.infrastructure.interfaces.IScheduleCreator;
-import u17112631.infrastructure.SinglePointSelectionPerturbativeSearch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,26 +22,29 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        //ExamFileReader reader = new ExamFileReader(solutionFileBase + "exam_comp_set1"+".exam");
-        //ExamProblemSet problemset = reader.CreateProblemSetFromFile();
+        ExamFileReader reader = new ExamFileReader(solutionFileBase + "exam_comp_set1"+".exam");
+        ExamProblemSet problemset = reader.CreateProblemSetFromFile();
 
-        //IMoveAccepter moveAccepter = new ImprovementAccepter();
+        List<IHardConstraint> constraints = new ArrayList<>();
+        constraints.add(new PeriodHardConstraint("1,EXAM_COINCIDENCE,2"));
+        constraints.add(new PeriodHardConstraint("3,EXCLUSION,4"));
+        constraints.add(new PeriodHardConstraint("5,AFTER,6"));
+
+        HardConstraintCalculator validator = new HardConstraintCalculator(constraints);
+
+        SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator();
+        IMoveAccepter moveAccepter = new ImprovementAccepter(fitnessFunction,validator);
+
         List<PerturbativeHeuristic> heuristicList = new ArrayList<>();
         heuristicList.add( new PeriodSwapHeuristic());
         heuristicList.add( new RoomSwapHeuristic());
 
         IHeuristicSelecter heuristicSelector = new RandomHeuristicSelector(heuristicList);
 
-        var a = heuristicSelector.hasNext();
-        var b = heuristicSelector.getNextHeuristic();
-        var c = heuristicSelector.hasNext();
-        var d = heuristicSelector.getNextHeuristic();
-        var e = heuristicSelector.hasNext();
-        var f = heuristicSelector.getNextHeuristic();
+        IScheduleCreator scheduleCreator = new FirstFitCreator(problemset);
 
-        IScheduleCreator scheduleCreator = new FirstFitCreator();
-
-        //SinglePointSelectionPerturbativeSearch singlePoint = new SinglePointSelectionPerturbativeSearch(moveAccepter,heuristicSelector,scheduleCreator);
+        SinglePointSelectionPerturbativeSearch singlePoint = new SinglePointSelectionPerturbativeSearch(moveAccepter,heuristicSelector,scheduleCreator);
+        singlePoint.run();
 //        long seed = 2;
 //        String possibleHeuristics=new String("lew");
 //

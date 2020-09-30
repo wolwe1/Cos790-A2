@@ -12,9 +12,9 @@ public class SinglePointSelectionPerturbativeSearch {
     IHeuristicSelecter heuristicSelector;
     IScheduleCreator scheduleCreator;
 
-    public SinglePointSelectionPerturbativeSearch(IMoveAccepter accepter,IHeuristicSelecter selecter, IScheduleCreator creator){
+    public SinglePointSelectionPerturbativeSearch(IMoveAccepter accepter,IHeuristicSelecter selector, IScheduleCreator creator){
         this.moveAccepter = accepter;
-        this.heuristicSelector = selecter;
+        this.heuristicSelector = selector;
         this.scheduleCreator = creator;
     }
 

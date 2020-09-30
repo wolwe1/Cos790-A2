@@ -1,8 +1,11 @@
 package u17112631.dto.constraints.hardConstraints.period;
 
+import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
+import u17112631.dto.constraints.hardConstraints.interfaces.IPeriodHardConstraintRule;
 import u17112631.dto.primitives.Exam;
+import u17112631.dto.primitives.ExamSchedule;
 
-public class PeriodHardConstraint {
+public class PeriodHardConstraint implements IHardConstraint {
 
     private final int _examOne;
     private final int _examTwo;
@@ -36,8 +39,9 @@ public class PeriodHardConstraint {
         return exam.getExamNumber() == _examOne || exam.getExamNumber() == _examTwo;
     }
 
-    public int GetLinkedExam(Exam exam) {
-        return exam.getExamNumber() == _examOne ? _examTwo : _examOne;
-    }
 
+    @Override
+    public boolean containsViolation(ExamSchedule schedule) {
+        return _rule.containsViolation(schedule);
+    }
 }

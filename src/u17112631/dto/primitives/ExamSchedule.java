@@ -7,6 +7,10 @@ public class ExamSchedule {
 
     List<Period> periods;
 
+    public ExamSchedule(List<Period> periods){
+        this.periods = periods;
+    }
+
     public List<Period> getPeriods() {
 
         List<Period> periods = new ArrayList<>();

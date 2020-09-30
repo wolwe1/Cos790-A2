@@ -8,10 +8,12 @@ public class ImprovementAccepter implements IMoveAccepter {
     ExamSchedule baseline;
     double baselineFitness;
 
-    ExamFitnessFunction fitnessFunction;
+    SoftConstraintCalculator fitnessFunction;
+    HardConstraintCalculator validityChecker;
 
-    public ImprovementAccepter(ExamFitnessFunction function){
+    public ImprovementAccepter(SoftConstraintCalculator function,HardConstraintCalculator validator){
         fitnessFunction = function;
+        validityChecker = validator;
         baselineFitness = Double.POSITIVE_INFINITY;
     }
 
@@ -28,6 +30,10 @@ public class ImprovementAccepter implements IMoveAccepter {
 
     @Override
     public boolean acceptsChange(ExamSchedule schedule) {
+
+        if( validityChecker.validatesConstraints(schedule))
+            return false;
+
         double newFitness = fitnessFunction.getFitness(schedule);
 
         if(newFitness < baselineFitness)

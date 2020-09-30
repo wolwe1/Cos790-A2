@@ -84,7 +84,7 @@ public class ExamProblemSet{
 
         for (Room room : rooms) {
             if(room.getRoomNumber() == roomNumber)
-                return room.makeCopy();
+                return room.getCopy();
         }
 
         return null;
