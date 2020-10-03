@@ -48,10 +48,14 @@ public class FirstFitCreator implements IScheduleCreator {
     }
 
     private void placeExam(Exam exam, ExamSchedule schedule) {
-        //TODO: Implement this
+
         Period firstPeriodToFitExam = getFirstPeriodToFitExam(exam,schedule);
+        if(firstPeriodToFitExam == null) throw new RuntimeException("Cannot find period to fit exam");
+
         Room firstRoomToFitExam = getFirstRoomToFitExam(firstPeriodToFitExam,exam);
-        firstPeriodToFitExam.placeExam(exam);
+        if(firstRoomToFitExam == null) throw new RuntimeException("Period found but no room to place");
+
+        firstRoomToFitExam.placeExam(exam);
 
         schedule.updatePeriod(firstPeriodToFitExam);
     }

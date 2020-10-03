@@ -2,14 +2,13 @@ package u17112631;
 
 import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
 import u17112631.dto.constraints.hardConstraints.period.PeriodHardConstraint;
+import u17112631.dto.constraints.hardConstraints.room.RoomHardConstraint;
 import u17112631.dto.primitives.ExamProblemSet;
 import u17112631.helpers.ExamFileReader;
 import u17112631.infrastructure.SinglePointSelectionPerturbativeSearch;
-import u17112631.infrastructure.heuristics.PeriodSwapHeuristic;
-import u17112631.infrastructure.heuristics.RoomSwapHeuristic;
+import u17112631.infrastructure.heuristics.*;
 import u17112631.infrastructure.implementation.*;
 import u17112631.infrastructure.interfaces.IHeuristicSelecter;
-import u17112631.infrastructure.heuristics.PerturbativeHeuristic;
 import u17112631.infrastructure.interfaces.IMoveAccepter;
 import u17112631.infrastructure.interfaces.IScheduleCreator;
 
@@ -18,30 +17,32 @@ import java.util.List;
 
 public class Main {
 
-    static final String solutionFileBase = "exam_comp_set";
+    static final String solutionFileBase = "data\\TTC07tools\\";
 
     public static void main(String[] args) throws Exception {
 
-        ExamFileReader reader = new ExamFileReader(solutionFileBase + "exam_comp_set1"+".exam");
-        ExamProblemSet problemset = reader.CreateProblemSetFromFile();
+        ExamFileReader reader = new ExamFileReader(solutionFileBase + "test"+".exam");
+        ExamProblemSet problemSet = reader.CreateProblemSetFromFile();
 
         List<IHardConstraint> constraints = new ArrayList<>();
-        constraints.add(new PeriodHardConstraint("1,EXAM_COINCIDENCE,2"));
-        constraints.add(new PeriodHardConstraint("3,EXCLUSION,4"));
-        constraints.add(new PeriodHardConstraint("5,AFTER,6"));
+
+        constraints.addAll(problemSet.getRoomHardConstraints());
+        constraints.addAll(problemSet.getPeriodHardConstraints());
 
         HardConstraintCalculator validator = new HardConstraintCalculator(constraints);
 
-        SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator();
+        SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator(problemSet.getSoftConstraints());
         IMoveAccepter moveAccepter = new ImprovementAccepter(fitnessFunction,validator);
 
         List<PerturbativeHeuristic> heuristicList = new ArrayList<>();
         heuristicList.add( new PeriodSwapHeuristic());
         heuristicList.add( new RoomSwapHeuristic());
+        heuristicList.add( new RoomChangeHeuristic());
+        heuristicList.add( new PeriodChangeHeuristic());
 
         IHeuristicSelecter heuristicSelector = new RandomHeuristicSelector(heuristicList);
 
-        IScheduleCreator scheduleCreator = new FirstFitCreator(problemset);
+        IScheduleCreator scheduleCreator = new FirstFitCreator(problemSet,validator);
 
         SinglePointSelectionPerturbativeSearch singlePoint = new SinglePointSelectionPerturbativeSearch(moveAccepter,heuristicSelector,scheduleCreator);
         singlePoint.run();
@@ -49,7 +50,7 @@ public class Main {
 //        String possibleHeuristics=new String("lew");
 //
 //        //Create the genetic algorithm and set parameters
-//        CustomGenAlg geneticAlgorithm = new CustomGenAlg(seed,possibleHeuristics);
+//        GenAlg geneticAlgorithm = new CustomGenAlg(seed,possibleHeuristics);
 //        geneticAlgorithm.setPopulationSize(50);
 //        geneticAlgorithm.setTournamentSize(3);
 //        geneticAlgorithm.setNoOfGenerations(15);

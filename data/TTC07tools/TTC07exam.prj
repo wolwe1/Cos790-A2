@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+<options>
+<option name="repeatPresolve" value="3"/>
+</options>
+<model name="TTC07exam.mod"/>
+<data name="TTC07exam.dat" />
+<data name="TTC07exam.sln.dat" />
+</project>

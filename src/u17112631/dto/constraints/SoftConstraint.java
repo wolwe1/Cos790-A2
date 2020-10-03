@@ -3,12 +3,12 @@ package u17112631.dto.constraints;
 import u17112631.dto.constraints.softConstraint.*;
 import u17112631.dto.primitives.ExamSchedule;
 
-public class InstitutionalWeighting {
+public class SoftConstraint {
 
     private ISoftConstraintRule _rule;
     private int _penalty;
 
-    public InstitutionalWeighting(String input) {
+    public SoftConstraint(String input) {
 
         String[] info = input.split(",");
 
@@ -16,19 +16,19 @@ public class InstitutionalWeighting {
 
         switch (info[0]) {
             case "TWOINAROW":
-                _rule = new TwoInARowSoftConstraint();
+                _rule = new TwoInARowSoftConstraintRule();
                 break;
             case "TWOINADAY":
-                _rule = new TwoInADaySoftConstraint();
+                _rule = new TwoInADaySoftConstraintRule();
                 break;
             case "PERIODSPREAD":
-                _rule = new PeriodSpreadSoftConstraint();
+                _rule = new PeriodSpreadSoftConstraintRule();
                 break;
             case "NONMIXEDDURATIONS":
-                _rule = new NonMixedDurationsSoftConstraint();
+                _rule = new NonMixedDurationsSoftConstraintRule();
                 break;
             case "FRONTLOAD":
-                _rule = new FrontLoadSoftConstraint(Integer.parseInt(info[1].strip()),Integer.parseInt(info[2].strip()));
+                _rule = new FrontLoadSoftConstraintRule(Integer.parseInt(info[1].strip()),Integer.parseInt(info[2].strip()));
                 _penalty = Integer.parseInt(info[3].strip());
                 break;
         }

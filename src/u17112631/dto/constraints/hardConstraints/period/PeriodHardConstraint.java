@@ -24,13 +24,13 @@ public class PeriodHardConstraint implements IHardConstraint {
 
         switch (info[1].strip()){
             case "EXAM_COINCIDENCE" :
-                _rule = new ExamCoincidenceRule();
+                _rule = new ExamCoincidenceRule(_examOne,_examTwo);
                 break;
             case "EXCLUSION" :
-                _rule = new ExclusionRule();
+                _rule = new ExclusionRule(_examOne,_examTwo);
                 break;
             case "AFTER" :
-                _rule = new AfterRule();
+                _rule = new AfterRule(_examOne,_examTwo);
                 break;
         }
     }

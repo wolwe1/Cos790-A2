@@ -2,11 +2,13 @@ package u17112631.dto.primitives;
 
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class Room {
 
-    private final int capacity;
+    private int capacity;
     private int penalty;
     private final int roomNumber;
     private final List<Exam> exams;
@@ -30,7 +32,7 @@ public class Room {
         exams = other.getExams();
     }
 
-    private List<Exam> getExams() {
+    public List<Exam> getExams() {
         List<Exam> exams = new ArrayList<>();
 
         for (Exam exam : this.exams) {
@@ -61,11 +63,11 @@ public class Room {
         return new Room(this);
     }
 
-    public int getNumExams() {
+    public int getNumberOfExams() {
         return this.exams.size();
     }
 
-    public Exam getExam(int i) {
+    public Exam getExamByIndex(int i) {
 
         if(i < 0 || i >= this.exams.size()) throw new RuntimeException("Attempted to access exam out of range");
 
@@ -74,9 +76,13 @@ public class Room {
 
     public boolean containsExam(Exam examToLookFor) {
 
+        return containsExam(examToLookFor.getExamNumber());
+    }
+    public boolean containsExam(int examNumber) {
+
         for (Exam exam : exams) {
 
-            if(exam.getExamNumber() == examToLookFor.getExamNumber())
+            if(exam.getExamNumber() == examNumber)
                 return true;
         }
 
@@ -112,5 +118,39 @@ public class Room {
         }
 
         return replaceIndex;
+    }
+
+    public boolean canFitExam(Exam exam) {
+        return exam.getNumberOfStudents() <= capacity;
+    }
+
+    public void placeExam(Exam exam) {
+        exams.add(exam);
+        this.capacity -= exam.getNumberOfStudents();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Room room = (Room) o;
+        return roomNumber == room.roomNumber;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roomNumber);
+    }
+
+    public void removeExam(Exam examToRemove) {
+        this.exams.remove(examToRemove);
+    }
+
+    public List<Student> getStudents() {
+        List<Student> studentsWritingInRoom = new ArrayList<>();
+        for (Exam exam : exams) {
+            studentsWritingInRoom.addAll(exam.getStudents());
+        }
+        return studentsWritingInRoom;
     }
 }

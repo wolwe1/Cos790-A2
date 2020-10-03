@@ -6,13 +6,11 @@ import u17112631.dto.primitives.ExamSchedule;
 
 public class RoomHardConstraint implements IHardConstraint {
 
-    private final int _room;
-    private IRoomHardConstraintRule _rule;
+    private final IRoomHardConstraintRule _rule;
 
     public RoomHardConstraint(String input) {
         String[] info = input.split(",");
-        _room = Integer.parseInt(info[0]);
-        _rule = new RoomExclusiveRule();
+        _rule = new RoomExclusiveRule(Integer.parseInt(info[0]) );
     }
 
     @Override

@@ -1,6 +1,7 @@
 package u17112631.dto.primitives;
 
-import u17112631.dto.constraints.InstitutionalWeighting;
+import u17112631.dto.constraints.SoftConstraint;
+import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
 import u17112631.dto.constraints.hardConstraints.period.PeriodHardConstraint;
 import u17112631.dto.constraints.hardConstraints.room.RoomHardConstraint;
 
@@ -14,7 +15,7 @@ public class ExamProblemSet{
     List<Room> rooms;
     List<PeriodHardConstraint> periodHardConstraints;
     List<RoomHardConstraint> roomHardConstraints;
-    List<InstitutionalWeighting> softConstraints;
+    List<SoftConstraint> softConstraints;
 
     public List<Exam> getExams() {
         List<Exam> examCopies = new ArrayList<>();
@@ -59,34 +60,15 @@ public class ExamProblemSet{
         this.roomHardConstraints = _roomHardConstrains;
     }
 
-    public List<InstitutionalWeighting> getSoftConstraints() {
+    public List<SoftConstraint> getSoftConstraints() {
         return softConstraints;
     }
 
-    public void setSoftConstraints(List<InstitutionalWeighting> softConstraints) {
+    public void setSoftConstraints(List<SoftConstraint> softConstraints) {
         this.softConstraints = softConstraints;
     }
 
-    //Constraints
-    public PeriodHardConstraint ExamConstrained(Exam exam){
-
-        for (PeriodHardConstraint periodHardConstraint : periodHardConstraints) {
-
-            if(periodHardConstraint.contains(exam))
-                return periodHardConstraint;
-        }
-        return null;
-    }
-
-
-    public Room get_room(Integer roomNumber) {
-        var rooms = this.rooms;
-
-        for (Room room : rooms) {
-            if(room.getRoomNumber() == roomNumber)
-                return room.getCopy();
-        }
-
-        return null;
+    public List<? extends IHardConstraint> getPeriodHardConstraints() {
+        return periodHardConstraints;
     }
 }

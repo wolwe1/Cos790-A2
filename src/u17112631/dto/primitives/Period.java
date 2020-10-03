@@ -8,10 +8,10 @@ public class Period {
 
 
 
-    private Date date;
-    private int duration;
-    private int penalty;
-    private int periodNumber;
+    private final Date date;
+    private final int duration;
+    private final int penalty;
+    private final int periodNumber;
     private List<Room> rooms;
 
     public Period(String period, int periodNumber) throws ParseException {
@@ -84,7 +84,7 @@ public class Period {
         int totalExams = 0;
 
         for (Room room : rooms) {
-            totalExams += room.getNumExams();
+            totalExams += room.getNumberOfExams();
         }
 
         return totalExams;
@@ -120,10 +120,10 @@ public class Period {
 
         for (Room room : rooms) {
 
-            if(examIndex < room.getNumExams() + previousExams)
-                return room.getExam(examIndex - previousExams);
+            if(examIndex < room.getNumberOfExams() + previousExams)
+                return room.getExamByIndex(examIndex - previousExams);
             else
-                previousExams += room.getNumExams();
+                previousExams += room.getNumberOfExams();
         }
 
         throw new RuntimeException("Period does not contain exam index");
@@ -133,7 +133,7 @@ public class Period {
         return this.rooms.size();
     }
 
-    public Room getRoom(int roomIndex) {
+    public Room getRoomByIndex(int roomIndex) {
 
         if(roomIndex < 0 || roomIndex >= this.rooms.size()) throw new RuntimeException("Attempted to access room that does not exist in period");
 
@@ -156,5 +156,79 @@ public class Period {
         }
 
         throw new RuntimeException("Room not found in period");
+    }
+
+    public boolean canFitExam(Exam exam) {
+
+        for (Room room : rooms) {
+            if(room.canFitExam(exam))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean containsExam(int examOne) {
+        for (Room room : rooms) {
+            if(room.containsExam(examOne))
+                return true;
+        }
+
+        return false;
+    }
+
+    public Room findRoomWithExam(int examNumber){
+        return findRoomWithExam(new Exam(examNumber));
+    }
+
+    public Room getRoom(int roomNumber) {
+
+        for (Room room : rooms) {
+            if(room.getRoomNumber() == roomNumber)
+                return room;
+        }
+
+        throw new RuntimeException("Room not found in period");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Period period = (Period) o;
+        return periodNumber == period.periodNumber;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(periodNumber);
+    }
+
+    public List<Exam> getExams() {
+
+        List<Exam> examsInPeriod = new ArrayList<>();
+        for (Room room : rooms) {
+            examsInPeriod.addAll(room.getExams());
+        }
+        return examsInPeriod;
+    }
+
+    public int GetNumberOfSharedStudents(Period other) {
+
+        var studentsInThisPeriod = getStudents();
+        var studentsInOtherPeriod = other.getStudents();
+
+        var sharedStudents = new ArrayList<>(studentsInThisPeriod);
+        sharedStudents.retainAll(studentsInOtherPeriod);
+
+        return sharedStudents.size();
+    }
+
+    public List<Student> getStudents(){
+
+        List<Student> studentsInPeriod = new ArrayList<>();
+        for (Room room : rooms) {
+            studentsInPeriod.addAll(room.getStudents());
+        }
+        return studentsInPeriod;
     }
 }

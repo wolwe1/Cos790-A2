@@ -1,6 +1,6 @@
 package u17112631.helpers;
 
-import u17112631.dto.constraints.InstitutionalWeighting;
+import u17112631.dto.constraints.SoftConstraint;
 import u17112631.dto.constraints.hardConstraints.period.PeriodHardConstraint;
 import u17112631.dto.constraints.hardConstraints.room.RoomHardConstraint;
 import u17112631.dto.primitives.Exam;
@@ -52,7 +52,7 @@ public class ExamFileReader {
             //Constrains
             List<PeriodHardConstraint> periodConstraints = ReadPeriodConstraints(df);
             List<RoomHardConstraint> roomConstraints = ReadRoomConstraints(df);
-            List<InstitutionalWeighting> institutionalWeightings = ReadInstitutionalWeightings(df);
+            List<SoftConstraint> softConstraints = ReadInstitutionalWeightings(df);
 
             ExamProblemSet problemSet = new ExamProblemSet();
             problemSet.setExams(exams);
@@ -60,7 +60,7 @@ public class ExamFileReader {
             problemSet.setRooms(rooms);
             problemSet.setPeriodHardConstraints(periodConstraints);
             problemSet.set_roomHardConstraints(roomConstraints);
-            problemSet.setSoftConstraints(institutionalWeightings);
+            problemSet.setSoftConstraints(softConstraints);
 
             return problemSet;
 
@@ -71,14 +71,14 @@ public class ExamFileReader {
 
     }
 
-    private List<InstitutionalWeighting> ReadInstitutionalWeightings(BufferedReader df) throws IOException {
+    private List<SoftConstraint> ReadInstitutionalWeightings(BufferedReader df) throws IOException {
 
-        List<InstitutionalWeighting> weightings = new ArrayList<>();
+        List<SoftConstraint> weightings = new ArrayList<>();
 
         String input = df.readLine();
 
         while(input != null && !input.isBlank()) {
-            weightings.add( new InstitutionalWeighting(input));
+            weightings.add( new SoftConstraint(input));
             input = df.readLine();
         }
 
