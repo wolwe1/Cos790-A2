@@ -72,4 +72,13 @@ public class Exam {
     public List<Student> getStudents() {
         return this.students;
     }
+
+    public boolean hasStudents(List<Student> students) {
+        var studentsWritingExam = getStudents();
+        Set<Student> studentsWritingSet = new HashSet<>(studentsWritingExam);
+        Set<Student> studentsSet = new HashSet<>(students);
+
+        return !Collections.disjoint(studentsWritingSet,studentsSet);
+
+    }
 }

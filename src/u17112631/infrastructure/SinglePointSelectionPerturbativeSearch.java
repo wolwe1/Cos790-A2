@@ -26,13 +26,13 @@ public class SinglePointSelectionPerturbativeSearch {
         ExamSchedule bestSchedule = scheduleCreator.createSchedule();
 
         //Set the baseline for the move accepter
-        moveAccepter.setSchedule(bestSchedule);
-
+        moveAccepter.setSchedule(bestSchedule.getCopy());
+        //TODO: Ensure no reference changes
         while (heuristicSelector.hasNext()) {
 
             //Select a starting heuristic
             PerturbativeHeuristic heuristic = heuristicSelector.getNextHeuristic();
-            heuristic.setSchedule(bestSchedule);
+            heuristic.setSchedule(bestSchedule.getCopy());
 
             heuristic.makeChange();
 

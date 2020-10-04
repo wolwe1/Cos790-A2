@@ -31,11 +31,11 @@ public class FrontLoadSoftConstraintRule implements ISoftConstraintRule {
             int sizeA = a.getNumberOfStudents();
             int sizeB = b.getNumberOfStudents();
 
-            return Integer.compare(sizeB, sizeA);
+            return Integer.compare(sizeA, sizeB);
         });
 
-        var largestExams = exams.subList(exams.size() - examSizeThreshold, exams.size() - 1);
-        var lastPeriods = periods.subList(periods.size() - periodDurationThreshold, periods.size() - 1);
+        var largestExams = exams.subList((exams.size() - examSizeThreshold) - 1, exams.size() - 1);
+        var lastPeriods = periods.subList((periods.size() - periodDurationThreshold) - 1, periods.size() - 1);
 
         int totalOffenses = 0;
         for (Exam largestExam : largestExams) {

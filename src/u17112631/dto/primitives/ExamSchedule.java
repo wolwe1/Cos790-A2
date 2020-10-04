@@ -11,6 +11,10 @@ public class ExamSchedule {
         this.periods = periods;
     }
 
+    public ExamSchedule(ExamSchedule other) {
+        this.periods = other.getPeriods();
+    }
+
     public List<Period> getPeriods() {
 
         List<Period> periods = new ArrayList<>();
@@ -43,5 +47,9 @@ public class ExamSchedule {
         }
 
         this.periods.set(periodIndex,updatedPeriod);
+    }
+
+    public ExamSchedule getCopy() {
+        return new ExamSchedule(this);
     }
 }

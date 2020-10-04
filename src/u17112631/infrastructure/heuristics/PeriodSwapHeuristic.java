@@ -37,6 +37,8 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
             if(swap(roomOne,roomTwo)){
                 this.schedule.updatePeriod(firstPeriod);
                 this.schedule.updatePeriod(secondPeriod);
+
+                return;
             }
             else
                 unsuitablePeriods.add(secondPeriod);
@@ -61,6 +63,8 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
         Exam firstExam = pickExam(roomOne);
         Exam secondExam = pickExam(roomTwo);
 
+        if(firstExam == null || secondExam == null) return false;
+        
         List<Exam> unsuitableExamsForSecondRoom = new ArrayList<>();
         List<Exam> unsuitableExamsForFirstRoom = new ArrayList<>();
 
@@ -87,8 +91,8 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
         if(!found)
             return false;
 
-        roomOne.swap(firstExam,secondExam);
-        roomTwo.swap(secondExam,firstExam);
+        roomOne.replace(firstExam,secondExam);
+        roomTwo.replace(secondExam,firstExam);
 
         return true;
     }

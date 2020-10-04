@@ -8,6 +8,9 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Checks if a student is writing in the same day twice, But NOT if there are only two periods since that's already penalised
+ */
 public class TwoInADaySoftConstraintRule implements ISoftConstraintRule {
     @Override
     public int CountOffenses(ExamSchedule schedule) {

@@ -231,4 +231,9 @@ public class Period {
         }
         return studentsInPeriod;
     }
+
+    public boolean hasNoStudentConflict(Exam exam) {
+        var studentsAlreadyInPeriod = getStudents();
+        return !exam.hasStudents(studentsAlreadyInPeriod);
+    }
 }

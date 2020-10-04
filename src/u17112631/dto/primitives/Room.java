@@ -153,4 +153,9 @@ public class Room {
         }
         return studentsWritingInRoom;
     }
+
+    public boolean hasNoStudentConflict(Exam exam) {
+        var studentsAlreadyInPeriod = getStudents();
+        return !exam.hasStudents(studentsAlreadyInPeriod);
+    }
 }

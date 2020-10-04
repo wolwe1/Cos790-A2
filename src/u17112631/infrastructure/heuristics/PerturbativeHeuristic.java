@@ -70,6 +70,9 @@ public abstract class PerturbativeHeuristic {
     protected Exam pickExam(Period chosenPeriod) {
 
         int numExamsInPeriod = chosenPeriod.getNumberOfExams();
+        if(numExamsInPeriod == 0)
+            return null;
+
         int examOne = numGen.nextInt(numExamsInPeriod);
 
         return chosenPeriod.getExam(examOne);
@@ -83,6 +86,10 @@ public abstract class PerturbativeHeuristic {
     protected Exam pickExam(Room room) {
 
         int numExams = room.getNumberOfExams();
+
+        if(numExams == 0)
+            return null;
+
         int chosenExam = numGen.nextInt(numExams);
 
         return room.getExamByIndex(chosenExam);
@@ -116,7 +123,7 @@ public abstract class PerturbativeHeuristic {
             unusedRoomNumbers.remove(chosenRoom);
 
             if(unusedRoomNumbers.size() == 0)
-                throw new RuntimeException("There are no periods with exams");
+                throw new RuntimeException("There are no rooms in period with exams");
 
             chosenRoom = numGen.nextInt(unusedRoomNumbers.size());
         }

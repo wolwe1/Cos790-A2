@@ -5,9 +5,7 @@ import u17112631.dto.primitives.ExamSchedule;
 import u17112631.dto.primitives.Period;
 import u17112631.dto.primitives.Room;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 

@@ -32,9 +32,12 @@ public class RoomSwapHeuristic extends PerturbativeHeuristic {
             Exam examOne = pickExam(roomOne);
             Exam examTwo = pickExam(roomTwo);
 
+            if(examOne == null || examTwo == null)
+                continue;
+
             if(canSwap(roomOne,roomTwo,examOne,examTwo)){
                 roomOne.replace(examOne,examTwo);
-                roomOne.replace(examTwo,examOne);
+                roomTwo.replace(examTwo,examOne);
 
                 chosenPeriod.updateRoom(roomOne);
                 chosenPeriod.updateRoom(roomTwo);
