@@ -1,4 +1,4 @@
-package u17112631.infrastructure.implementation;
+package u17112631.infrastructure.implementation.selectors;
 
 import u17112631.infrastructure.interfaces.IHeuristicSelecter;
 import u17112631.infrastructure.heuristics.PerturbativeHeuristic;
@@ -6,12 +6,12 @@ import u17112631.infrastructure.heuristics.PerturbativeHeuristic;
 import java.util.List;
 import java.util.ListIterator;
 
-public class RandomHeuristicSelector implements IHeuristicSelecter {
+public class IterativeHeuristicSelector implements IHeuristicSelecter {
 
     List<PerturbativeHeuristic> heuristics;
     ListIterator<PerturbativeHeuristic> iterator;
     
-    public RandomHeuristicSelector(List<PerturbativeHeuristic> heuristics){
+    public IterativeHeuristicSelector(List<PerturbativeHeuristic> heuristics){
         this.heuristics = heuristics;
         iterator = this.heuristics.listIterator();
     }

@@ -203,7 +203,7 @@ public class FirstFitCreator implements IScheduleCreator {
         if (firstRoomToFitExam == null) throw new RuntimeException("Period found but no room to place");
 
         firstRoomToFitExam.placeExam(exam);
-
+        firstPeriodToFitExam.updateRoom(firstRoomToFitExam);
         schedule.updatePeriod(firstPeriodToFitExam);
     }
 

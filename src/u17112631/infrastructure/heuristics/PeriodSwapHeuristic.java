@@ -20,8 +20,8 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
 
         List<Period> unsuitablePeriods = new ArrayList<>();
         //Get a period with a room that houses exams
-        Period firstPeriod = getPeriodWithExams();
-        Room roomOne = getRoomWithExams(firstPeriod);
+        Period firstPeriod = pickPeriodWithExams();
+        Room roomOne = pickRoomWithExams(firstPeriod);
 
         //Dont use first period for further searching
         unsuitablePeriods.add(firstPeriod);
@@ -32,9 +32,14 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
             //Search for a different period, which has the same room that also has exams
             secondPeriod = getPeriodWithExams(unsuitablePeriods);
 
+            if(secondPeriod == null)
+                return;
+
             Room roomTwo = secondPeriod.getRoom(roomOne.getRoomNumber());
 
             if(swap(roomOne,roomTwo)){
+                firstPeriod.updateRoom(roomOne);
+                secondPeriod.updateRoom(roomTwo);
                 this.schedule.updatePeriod(firstPeriod);
                 this.schedule.updatePeriod(secondPeriod);
 
@@ -56,7 +61,7 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
         unusedPeriodNumbers.removeIf(
                 unusedPeriodNumber -> unsuitablePeriods.contains(periods.get(unusedPeriodNumber)));
 
-        return getPeriodWithExams(periods, unusedPeriodNumbers, numGen.nextInt(unusedPeriodNumbers.size()));
+        return pickPeriodWithExams(periods, unusedPeriodNumbers, numGen.nextInt(unusedPeriodNumbers.size()));
     }
 
     private boolean swap(Room roomOne, Room roomTwo) {
@@ -91,8 +96,8 @@ public class PeriodSwapHeuristic extends PerturbativeHeuristic {
         if(!found)
             return false;
 
-        roomOne.replace(firstExam,secondExam);
-        roomTwo.replace(secondExam,firstExam);
+        roomOne.replace(firstExam.getCopy(),secondExam.getCopy());
+        roomTwo.replace(secondExam.getCopy(),firstExam.getCopy());
 
         return true;
     }

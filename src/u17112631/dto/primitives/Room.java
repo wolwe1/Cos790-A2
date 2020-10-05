@@ -144,6 +144,7 @@ public class Room {
 
     public void removeExam(Exam examToRemove) {
         this.exams.remove(examToRemove);
+        this.capacity += examToRemove.getNumberOfStudents();
     }
 
     public List<Student> getStudents() {

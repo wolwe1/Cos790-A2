@@ -24,10 +24,10 @@ public class SinglePointSelectionPerturbativeSearch {
 
         //Create initial solution
         ExamSchedule bestSchedule = scheduleCreator.createSchedule();
-
         //Set the baseline for the move accepter
         moveAccepter.setSchedule(bestSchedule.getCopy());
-        //TODO: Ensure no reference changes
+        System.out.println("Initial solution fitness: " + moveAccepter.getScheduleFitness());
+
         while (heuristicSelector.hasNext()) {
 
             //Select a starting heuristic
@@ -39,13 +39,14 @@ public class SinglePointSelectionPerturbativeSearch {
             if(moveAccepter.acceptsChange(heuristic.getSchedule())) {
 
                 heuristicCombination.append(heuristic.getId());
-
+                bestSchedule = heuristic.getSchedule();
                 //Reset the selector
                 heuristicSelector.reset();
 
             }
         }
 
+        System.out.println("Best performing heuristic combination fitness: " + moveAccepter.getScheduleFitness());
         return heuristicCombination.toString();
     }
 }

@@ -7,4 +7,6 @@ public interface IMoveAccepter {
     void setSchedule(ExamSchedule bestSchedule);
 
     boolean acceptsChange(ExamSchedule schedule);
+
+    double getScheduleFitness();
 }

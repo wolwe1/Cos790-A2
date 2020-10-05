@@ -6,13 +6,16 @@ import java.util.List;
 public class ExamSchedule {
 
     List<Period> periods;
+    int numberOfExams;
 
     public ExamSchedule(List<Period> periods){
         this.periods = periods;
+        numberOfExams = 0;
     }
 
     public ExamSchedule(ExamSchedule other) {
         this.periods = other.getPeriods();
+        this.numberOfExams = other.numberOfExams;
     }
 
     public List<Period> getPeriods() {
@@ -47,6 +50,13 @@ public class ExamSchedule {
         }
 
         this.periods.set(periodIndex,updatedPeriod);
+
+        //Update exam count
+        int numExams = 0;
+        for (Period period : periods) {
+            numExams += period.getNumberOfExams();
+        }
+        this.numberOfExams = numExams;
     }
 
     public ExamSchedule getCopy() {

@@ -1,13 +1,14 @@
 package u17112631;
 
 import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
-import u17112631.dto.constraints.hardConstraints.period.PeriodHardConstraint;
-import u17112631.dto.constraints.hardConstraints.room.RoomHardConstraint;
 import u17112631.dto.primitives.ExamProblemSet;
 import u17112631.helpers.ExamFileReader;
 import u17112631.infrastructure.SinglePointSelectionPerturbativeSearch;
 import u17112631.infrastructure.heuristics.*;
 import u17112631.infrastructure.implementation.*;
+import u17112631.infrastructure.implementation.selectors.GreedyHeuristicSelector;
+import u17112631.infrastructure.implementation.selectors.IterativeHeuristicSelector;
+import u17112631.infrastructure.implementation.selectors.RandomHeuristicSelector;
 import u17112631.infrastructure.interfaces.IHeuristicSelecter;
 import u17112631.infrastructure.interfaces.IMoveAccepter;
 import u17112631.infrastructure.interfaces.IScheduleCreator;
@@ -17,21 +18,18 @@ import java.util.List;
 
 public class Main {
 
-    static final String solutionFileBase = "data\\TTC07tools\\";
-
-    public static void main(String[] args) throws Exception {
-
-        ExamFileReader reader = new ExamFileReader(solutionFileBase + "test"+".exam");
-        ExamProblemSet problemSet = reader.CreateProblemSetFromFile();
-
+    //2
+    //static final String solutionFileBase = "data\\TTC07tools\\";
+    static final String solutionFileBase = "data\\";
+    static SinglePointSelectionPerturbativeSearch setup(long seed, ExamProblemSet set){
         List<IHardConstraint> constraints = new ArrayList<>();
 
-        constraints.addAll(problemSet.getRoomHardConstraints());
-        constraints.addAll(problemSet.getPeriodHardConstraints());
+        constraints.addAll(set.getRoomHardConstraints());
+        constraints.addAll(set.getPeriodHardConstraints());
 
         HardConstraintCalculator validator = new HardConstraintCalculator(constraints);
 
-        SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator(problemSet.getSoftConstraints());
+        SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator(set.getSoftConstraints());
         IMoveAccepter moveAccepter = new ImprovementAccepter(fitnessFunction,validator);
 
         List<PerturbativeHeuristic> heuristicList = new ArrayList<>();
@@ -40,12 +38,27 @@ public class Main {
         heuristicList.add( new RoomChangeHeuristic());
         heuristicList.add( new PeriodChangeHeuristic());
 
-        IHeuristicSelecter heuristicSelector = new RandomHeuristicSelector(heuristicList);
+        for (PerturbativeHeuristic perturbativeHeuristic : heuristicList) {
+            perturbativeHeuristic.setSeed(seed);
+        }
 
-        IScheduleCreator scheduleCreator = new FirstFitCreator(problemSet,validator);
+        IHeuristicSelecter heuristicSelector = new GreedyHeuristicSelector(heuristicList);
 
-        SinglePointSelectionPerturbativeSearch singlePoint = new SinglePointSelectionPerturbativeSearch(moveAccepter,heuristicSelector,scheduleCreator);
-        singlePoint.run();
+        IScheduleCreator scheduleCreator = new FirstFitCreator(set,validator);
+
+        return new SinglePointSelectionPerturbativeSearch(moveAccepter,heuristicSelector,scheduleCreator);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        ExamFileReader reader = new ExamFileReader(solutionFileBase + "exam_comp_set4"+".exam");
+        ExamProblemSet problemSet = reader.CreateProblemSetFromFile();
+
+
+
+        SinglePointSelectionPerturbativeSearch singlePoint = setup(1,problemSet);
+        String bestCombination = singlePoint.run();
+        System.out.println("Combination: " + bestCombination);
 //        long seed = 2;
 //        String possibleHeuristics=new String("lew");
 //

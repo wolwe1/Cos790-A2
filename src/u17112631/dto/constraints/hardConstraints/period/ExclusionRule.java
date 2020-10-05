@@ -29,7 +29,7 @@ public class ExclusionRule implements IPeriodHardConstraintRule {
                 return period.containsExam(examTwo);
             }
         }
-        throw new RuntimeException("Constraint not found");
+        return false;
     }
 
     @Override

@@ -21,16 +21,20 @@ public abstract class PerturbativeHeuristic {
         this.numGen = new Random(0);
     }
 
-    static Period getPeriodWithExams(List<Period> periods, List<Integer> unusedPeriodNumbers, int i) {
+    public void setSeed(long seed){
+        this.numGen.setSeed(seed);
+    }
+
+    protected Period pickPeriodWithExams(List<Period> periods, List<Integer> unusedPeriodNumbers, int i) {
         int chosenPeriod = i;
 
         while (periods.get(unusedPeriodNumbers.get(chosenPeriod)).getNumberOfExams() == 0){
             unusedPeriodNumbers.remove(chosenPeriod);
 
             if(unusedPeriodNumbers.size() == 0)
-                throw new RuntimeException("There are no periods with exams");
+                return null;
 
-            chosenPeriod = i;
+            chosenPeriod = numGen.nextInt(unusedPeriodNumbers.size());
         }
 
         return periods.get(unusedPeriodNumbers.get(chosenPeriod));
@@ -113,7 +117,7 @@ public abstract class PerturbativeHeuristic {
      * @param period The period to select from
      * @return A room with exams from the provided period
      */
-    protected Room getRoomWithExams(Period period) {
+    protected Room pickRoomWithExams(Period period) {
         var rooms = period.getRooms();
         var unusedRoomNumbers = IntStream.range(0,rooms.size()).boxed().collect(Collectors.toList());
 
@@ -135,12 +139,12 @@ public abstract class PerturbativeHeuristic {
      * Selects a random period from the schedule, the period must have exams
      * @return A random period that has exams
      */
-    protected Period getPeriodWithExams() {
+    protected Period pickPeriodWithExams() {
 
         var periods = schedule.getPeriods();
         var unusedPeriodNumbers = IntStream.range(0,periods.size()).boxed().collect(Collectors.toList());
 
-        return getPeriodWithExams(periods, unusedPeriodNumbers, numGen.nextInt(unusedPeriodNumbers.size()));
+        return pickPeriodWithExams(periods, unusedPeriodNumbers, numGen.nextInt(unusedPeriodNumbers.size()));
 
     }
 
@@ -158,7 +162,9 @@ public abstract class PerturbativeHeuristic {
         while ( unsuitableExams.contains(exams.get(examIndex))){
             exams.remove(exams.get(examIndex));
 
-            if(exams.size() == 0) throw new RuntimeException("Unable to pick exam");
+            if(exams.size() == 0) {
+                return null;
+            }
 
             examIndex = numGen.nextInt(exams.size());
         }
@@ -229,6 +235,9 @@ public abstract class PerturbativeHeuristic {
     }
 
     protected boolean canSwap(Room roomOne, Room roomTwo, Exam firstExam, Exam secondExam) {
+
+        if(firstExam == null || secondExam == null)
+            return false;
 
         int roomOneCapacityWithoutExam = roomOne.getCapacity() + firstExam.getNumberOfStudents();
         int roomTwoCapacityWithoutExam = roomTwo.getCapacity() + secondExam.getNumberOfStudents();

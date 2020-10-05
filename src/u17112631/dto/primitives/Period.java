@@ -42,7 +42,12 @@ public class Period {
     }
 
     public List<Room> getRooms() {
-        return rooms;
+        List<Room> roomCopies = new ArrayList<>();
+
+        for (Room room : rooms) {
+            roomCopies.add(room.getCopy());
+        }
+        return roomCopies;
     }
 
     public void setRooms(List<Room> rooms) {
@@ -184,7 +189,7 @@ public class Period {
 
         for (Room room : rooms) {
             if(room.getRoomNumber() == roomNumber)
-                return room;
+                return room.getCopy();
         }
 
         throw new RuntimeException("Room not found in period");

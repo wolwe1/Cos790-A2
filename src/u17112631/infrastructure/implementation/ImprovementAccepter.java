@@ -36,12 +36,17 @@ public class ImprovementAccepter implements IMoveAccepter {
 
         double newFitness = fitnessFunction.getFitness(schedule);
 
-        if(newFitness <= baselineFitness)
+        if(newFitness >= baselineFitness)
             return false;
 
         setSchedule(schedule,newFitness);
 
         return true;
+    }
+
+    @Override
+    public double getScheduleFitness() {
+        return baselineFitness;
     }
 
 

@@ -21,8 +21,8 @@ public class RoomChangeHeuristic extends PerturbativeHeuristic {
         List<Room> unusableRoomsForSourcing = new ArrayList<>();
         List<Exam> unusableExams= new ArrayList<>();
 
-        Period periodToPickFrom = pickPeriod();
-        Room roomToPickFrom = pickRoom(periodToPickFrom);
+        Period periodToPickFrom = pickPeriodWithExams();
+        Room roomToPickFrom = pickRoomWithExams(periodToPickFrom);
         Exam examToMove = pickExam(roomToPickFrom);
 
         unusableRoomsForMoving.add(roomToPickFrom);
