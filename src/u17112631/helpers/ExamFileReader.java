@@ -11,7 +11,9 @@ import u17112631.dto.primitives.Room;
 import java.io.*;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExamFileReader {
 
@@ -41,7 +43,7 @@ public class ExamFileReader {
             List<Room> rooms = ReadRooms(df,numRooms);
 
             for (Period period: periods){
-                List<Room> roomCopies = new ArrayList<>();
+                Set<Room> roomCopies = new HashSet<>();
 
                 for (Room room :
                         rooms) {

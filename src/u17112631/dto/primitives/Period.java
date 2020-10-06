@@ -12,9 +12,8 @@ public class Period {
     private final int duration;
     private final int penalty;
     private final int periodNumber;
-    private List<Room> rooms;
+    private Set<Room> rooms;
     private int numberOfExams;
-    private Set<Student> studentsInPeriod;
 
     public Period(String period, int periodNumber) throws ParseException {
         String[] info = period.split(",");
@@ -23,9 +22,8 @@ public class Period {
         this.duration = Integer.parseInt(info[2].strip());
         this.penalty = Integer.parseInt(info[3].strip());
         this.periodNumber = periodNumber;
-        this.rooms = new ArrayList<>();
+        this.rooms = new HashSet<>();
         this.numberOfExams = 0;
-        this.studentsInPeriod = new HashSet<>();
     }
 
     protected Period(Period other){
@@ -35,7 +33,6 @@ public class Period {
         this.periodNumber = other.periodNumber;
         this.rooms = other.getRooms();
         numberOfExams = 0;
-        this.studentsInPeriod = new HashSet<>(other.studentsInPeriod);
     }
 
     public int getPenalty() {
@@ -46,8 +43,8 @@ public class Period {
         return periodNumber;
     }
 
-    public List<Room> getRooms() {
-        List<Room> roomCopies = new ArrayList<>();
+    public Set<Room> getRooms() {
+        Set<Room> roomCopies = new HashSet<>();
 
         for (Room room : rooms) {
             roomCopies.add(room.getCopy());
@@ -55,7 +52,7 @@ public class Period {
         return roomCopies;
     }
 
-    public void setRooms(List<Room> rooms) {
+    public void setRooms(Set<Room> rooms) {
         this.rooms = rooms;
 
         int numExams = 0;
@@ -64,18 +61,6 @@ public class Period {
         }
         numberOfExams = numExams;
     }
-
-    public int getMaxRoomCapacity() {
-        int maxCapacity = 0;
-
-        for (Room room :
-                rooms) {
-            if(room.getCapacity() > maxCapacity)
-                maxCapacity = room.getCapacity();
-        }
-        return maxCapacity;
-    }
-
 
     public Date getDate() {
         return date;
@@ -116,22 +101,6 @@ public class Period {
         throw new RuntimeException("Period cannot find room with that exam");
     }
 
-
-    public Exam getExamByIndex(int examIndex) {
-
-        int previousExams = 0;
-
-        for (Room room : rooms) {
-
-            if(examIndex < room.getNumberOfExams() + previousExams)
-                return room.getExamByIndex(examIndex - previousExams);
-            else
-                previousExams += room.getNumberOfExams();
-        }
-
-        throw new RuntimeException("Period does not contain exam index");
-    }
-
     public Exam getExam(int examNumber){
         for (Room room : rooms) {
             if(room.containsExam(examNumber))
@@ -145,35 +114,16 @@ public class Period {
         return this.rooms.size();
     }
 
-    public Room getRoomByIndex(int roomIndex) {
-
-        if(roomIndex < 0 || roomIndex >= this.rooms.size()) throw new RuntimeException("Attempted to access room that does not exist in period");
-
-        return this.rooms.get(roomIndex).getCopy();
-    }
-
     public void updateRoom(Room updatedRoom) {
 
-        int roomIndex = getRoomIndex(updatedRoom);
-
-        this.rooms.set(roomIndex,updatedRoom);
+        this.rooms.remove(updatedRoom);
+        this.rooms.add(updatedRoom);
 
         int numExams = 0;
         for (Room room : rooms) {
             numExams += room.getNumberOfExams();
         }
         numberOfExams = numExams;
-    }
-
-    public int getRoomIndex(Room room){
-
-        for (int i = 0; i < this.rooms.size(); i++) {
-
-            if(this.rooms.get(i).getRoomNumber() == room.getRoomNumber())
-                return i;
-        }
-
-        throw new RuntimeException("Room not found in period");
     }
 
     public boolean canFitExam(Exam exam) {
@@ -235,15 +185,16 @@ public class Period {
         var studentsInThisPeriod = getStudents();
         var studentsInOtherPeriod = other.getStudents();
 
-        var sharedStudents = new ArrayList<>(studentsInThisPeriod);
+        var sharedStudents = new HashSet<>(studentsInThisPeriod);
         sharedStudents.retainAll(studentsInOtherPeriod);
 
         return sharedStudents.size();
     }
 
-    public List<Student> getStudents(){
+    public Set<Student> getStudents(){
 
-        List<Student> studentsInPeriod = new ArrayList<>();
+        Set<Student> studentsInPeriod = new HashSet<>();
+
         for (Room room : rooms) {
             studentsInPeriod.addAll(room.getStudents());
         }

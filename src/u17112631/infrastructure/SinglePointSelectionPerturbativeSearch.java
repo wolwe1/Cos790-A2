@@ -32,7 +32,7 @@ public class SinglePointSelectionPerturbativeSearch {
         double startingFitness = moveAccepter.getScheduleFitness();
         RunStatistics statistics = new RunStatistics();
         statistics.setStartingFitness(startingFitness);
-        System.out.println("Initial solution fitness: " + startingFitness);
+        //System.out.println("Initial solution fitness: " + startingFitness);
         long startTime = System.currentTimeMillis();
 
         while (heuristicSelector.hasNext()) {
@@ -49,6 +49,9 @@ public class SinglePointSelectionPerturbativeSearch {
                 bestSchedule = heuristic.getSchedule();
                 //Reset the selector
                 heuristicSelector.reset();
+
+                if(heuristicCombination.length() >= 35)
+                    break;
             }
         }
         long endTime = System.currentTimeMillis();
@@ -57,7 +60,7 @@ public class SinglePointSelectionPerturbativeSearch {
         statistics.addBestPerformer(heuristicCombination.toString());
         statistics.addBestFitness(moveAccepter.getScheduleFitness());
 
-        System.out.println("Best performing heuristic combination fitness: " + moveAccepter.getScheduleFitness());
+        //System.out.println("Best performing heuristic combination fitness: " + moveAccepter.getScheduleFitness());
         return statistics;
     }
 }

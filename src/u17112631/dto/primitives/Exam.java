@@ -5,7 +5,7 @@ import java.util.*;
 public class Exam {
 
     private final int duration;
-    private final List<Student> students;
+    private final Set<Student> students;
     private final int examNumber;
 
     public Exam(String examInfo, int examNumber) {
@@ -13,7 +13,7 @@ public class Exam {
         String[] info = examInfo.split(",");
         duration = Integer.parseInt(info[0]);
 
-            students = new ArrayList<>();
+            students = new HashSet<>();
 
         for (int i = 1; i < info.length; i++) {
             students.add( new Student(Integer.parseInt(info[i].strip())));
@@ -24,7 +24,7 @@ public class Exam {
     public Exam(Exam other){
         this.examNumber = other.examNumber;
         this.duration = other.duration;
-        this.students = new ArrayList<>();
+        this.students = new HashSet<>();
 
         this.students.addAll(other.students);
     }
@@ -69,11 +69,11 @@ public class Exam {
         return this.duration;
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return this.students;
     }
 
-    public boolean hasStudents(List<Student> students) {
+    public boolean hasStudents(Set<Student> students) {
         var studentsWritingExam = getStudents();
         Set<Student> studentsWritingSet = new HashSet<>(studentsWritingExam);
         Set<Student> studentsSet = new HashSet<>(students);

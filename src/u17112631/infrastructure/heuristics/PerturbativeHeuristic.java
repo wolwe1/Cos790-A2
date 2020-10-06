@@ -7,6 +7,7 @@ import u17112631.dto.primitives.Room;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -55,48 +56,25 @@ public abstract class PerturbativeHeuristic {
     }
 
     /**
-     * Selects a random period from the schedule
-     * @return A random period
-     */
-    protected Period pickPeriod() {
-
-        int numPeriods = schedule.getNumberOfPeriods();
-        int chosenPeriod = numGen.nextInt(numPeriods);
-
-        return schedule.getPeriod(chosenPeriod);
-    }
-
-    /**
-     * Selects a random exam given a period
-     * @param chosenPeriod The period to pick from
-     * @return A random exam in the given period
-     */
-    protected Exam pickExam(Period chosenPeriod) {
-
-        int numExamsInPeriod = chosenPeriod.getNumberOfExams();
-        if(numExamsInPeriod == 0)
-            return null;
-
-        int examOne = numGen.nextInt(numExamsInPeriod);
-
-        return chosenPeriod.getExamByIndex(examOne);
-    }
-
-    /**
      * Selects a random exam from a given room
      * @param room The room to pick from
      * @return A random exam from the provided room
      */
     protected Exam pickExam(Room room) {
 
-        int numExams = room.getNumberOfExams();
+        var exams = room.getExams();
 
-        if(numExams == 0)
+        if(exams.size() == 0)
             return null;
 
-        int chosenExam = numGen.nextInt(numExams);
+        int chosenExam = numGen.nextInt(exams.size());
 
-        return room.getExamByIndex(chosenExam);
+        var iter = exams.iterator();
+        for (int i = 0; i < chosenExam; i++) {
+            iter.next();
+        }
+
+        return iter.next();
     }
 
     /**
@@ -106,10 +84,16 @@ public abstract class PerturbativeHeuristic {
      */
     protected Room pickRoom(Period chosenPeriod) {
 
-        int numRooms = chosenPeriod.getNumberOfRooms();
-        int chosenRoom = numGen.nextInt(numRooms);
+        var rooms = chosenPeriod.getRooms();
+        var roomIter = rooms.iterator();
 
-        return chosenPeriod.getRoomByIndex(chosenRoom);
+
+        int chosenRoom = numGen.nextInt(rooms.size());
+        for (int i = 0; i < chosenRoom; i++) {
+            roomIter.next();
+        }
+
+        return roomIter.next();
     }
 
     /**
@@ -123,7 +107,7 @@ public abstract class PerturbativeHeuristic {
 
         int chosenRoom = numGen.nextInt(unusedRoomNumbers.size());
 
-        while (rooms.get(unusedRoomNumbers.get(chosenRoom)).getNumberOfExams() == 0){
+        while (searchForRoom(rooms,unusedRoomNumbers.get(chosenRoom)).getNumberOfExams() == 0){
             unusedRoomNumbers.remove(chosenRoom);
 
             if(unusedRoomNumbers.size() == 0)
@@ -132,7 +116,17 @@ public abstract class PerturbativeHeuristic {
             chosenRoom = numGen.nextInt(unusedRoomNumbers.size());
         }
 
-        return rooms.get(unusedRoomNumbers.get(chosenRoom));
+        return searchForRoom(rooms,unusedRoomNumbers.get(chosenRoom));
+    }
+
+    private Room searchForRoom(Set<Room> rooms, Integer index) {
+        var iter = rooms.iterator();
+
+        for (int i = 0; i < index ; i++) {
+            iter.next();
+        }
+
+        return iter.next();
     }
 
     /**
@@ -156,11 +150,11 @@ public abstract class PerturbativeHeuristic {
      */
     protected Exam pickExam(Room room, List<Exam> unsuitableExams) {
 
-        List<Exam> exams = room.getExams();
+        Set<Exam> exams = room.getExams();
         int examIndex = numGen.nextInt(exams.size());
 
-        while ( unsuitableExams.contains(exams.get(examIndex))){
-            exams.remove(exams.get(examIndex));
+        while ( unsuitableExams.contains(searchForExam(exams,examIndex))){
+            exams.remove(searchForExam(exams,examIndex));
 
             if(exams.size() == 0) {
                 return null;
@@ -169,7 +163,17 @@ public abstract class PerturbativeHeuristic {
             examIndex = numGen.nextInt(exams.size());
         }
 
-        return exams.get(examIndex);
+        return searchForExam(exams,examIndex);
+    }
+
+    private Exam searchForExam(Set<Exam> exams, int examIndex) {
+        var iter = exams.iterator();
+
+        for (int i = 0; i < examIndex; i++) {
+            iter.next();
+        }
+
+        return iter.next();
     }
 
     /**
@@ -205,15 +209,15 @@ public abstract class PerturbativeHeuristic {
         var rooms = period.getRooms();
         int chosenRoom = numGen.nextInt(rooms.size());
 
-        while (unsuitableRooms.contains(rooms.get(chosenRoom))){
-            rooms.remove(rooms.get(chosenRoom));
+        while (unsuitableRooms.contains(searchForRoom(rooms,chosenRoom))){
+            rooms.remove(searchForRoom(rooms,chosenRoom));
 
             if(rooms.size() == 0) throw new RuntimeException("Unable to pick room from period");
 
             chosenRoom = numGen.nextInt(rooms.size());
         }
 
-        return rooms.get(chosenRoom);
+        return searchForRoom(rooms,chosenRoom);
     }
 
     protected boolean periodHasExamsInDifferentRooms(Period period) {
@@ -249,14 +253,14 @@ public abstract class PerturbativeHeuristic {
         var rooms = period.getRooms();
         int chosenRoom = numGen.nextInt(rooms.size());
 
-        while (unsuitableRooms.contains(rooms.get(chosenRoom)) || rooms.get(chosenRoom).getNumberOfExams() == 0){
-            rooms.remove(rooms.get(chosenRoom));
+        while (unsuitableRooms.contains(searchForRoom(rooms,chosenRoom)) || searchForRoom(rooms,chosenRoom).getNumberOfExams() == 0){
+            rooms.remove(searchForRoom(rooms,chosenRoom));
 
             if(rooms.size() == 0) return null;
 
             chosenRoom = numGen.nextInt(rooms.size());
         }
 
-        return rooms.get(chosenRoom);
+        return searchForRoom(rooms,chosenRoom);
     }
 }

@@ -1,17 +1,14 @@
 package u17112631.dto.primitives;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Room {
 
     private int capacity;
     private int penalty;
     private final int roomNumber;
-    private final List<Exam> exams;
+    private final Set<Exam> exams;
 
     public Room(String room, int roomNumber) {
 
@@ -21,7 +18,7 @@ public class Room {
         penalty = Integer.parseInt(info[1].strip());
         this.roomNumber = roomNumber;
 
-        exams = new ArrayList<>();
+        exams = new HashSet<>();
     }
 
     protected Room(Room other){
@@ -32,8 +29,8 @@ public class Room {
         exams = other.getExams();
     }
 
-    public List<Exam> getExams() {
-        List<Exam> exams = new ArrayList<>();
+    public Set<Exam> getExams() {
+        Set<Exam> exams = new HashSet<>();
 
         for (Exam exam : this.exams) {
             exams.add( exam.getCopy());
@@ -66,14 +63,6 @@ public class Room {
     public int getNumberOfExams() {
         return this.exams.size();
     }
-
-    public Exam getExamByIndex(int i) {
-
-        if(i < 0 || i >= this.exams.size()) throw new RuntimeException("Attempted to access exam out of range");
-
-        return this.exams.get(i).getCopy();
-    }
-
     public boolean containsExam(Exam examToLookFor) {
 
         return containsExam(examToLookFor.getExamNumber());
@@ -93,31 +82,8 @@ public class Room {
 
         if(examToReplace.getExamNumber() == newExam.getExamNumber()) return;
 
-        int replaceIndex = getExamIndex(examToReplace);
-
-        exams.set(replaceIndex,newExam);
-    }
-
-    public void swap(Exam examOne, Exam examTwo) {
-
-        int firstIndex = getExamIndex(examOne);
-        int secondIndex = getExamIndex(examTwo);
-
-        exams.set(firstIndex,examTwo);
-        exams.set(secondIndex,examOne);
-
-    }
-
-    private int getExamIndex(Exam exam){
-
-        int replaceIndex = -1;
-
-        for (int i = 0; i < exams.size(); i++) {
-            if(exams.get(i).getExamNumber() == exam.getExamNumber())
-                replaceIndex = i;
-        }
-
-        return replaceIndex;
+        exams.remove(examToReplace);
+        exams.add(newExam);
     }
 
     public boolean canFitExam(Exam exam) {
@@ -147,8 +113,9 @@ public class Room {
         this.capacity += examToRemove.getNumberOfStudents();
     }
 
-    public List<Student> getStudents() {
-        List<Student> studentsWritingInRoom = new ArrayList<>();
+    public Set<Student> getStudents() {
+        Set<Student> studentsWritingInRoom = new HashSet<>();
+
         for (Exam exam : exams) {
             studentsWritingInRoom.addAll(exam.getStudents());
         }

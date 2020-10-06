@@ -22,6 +22,7 @@ public class RoomSwapHeuristic extends PerturbativeHeuristic {
 
         while (unsuitablePeriods.size() != schedule.getPeriods().size()){
             Period chosenPeriod = pickPeriodWithAnExamInMultipleRooms(unsuitablePeriods);
+            if(chosenPeriod == null) return;
             unsuitablePeriods.add(chosenPeriod);
 
             Room roomOne = pickRoom(chosenPeriod);
@@ -65,6 +66,6 @@ public class RoomSwapHeuristic extends PerturbativeHeuristic {
             else
                 unusablePeriods.add(period);
         }
-        throw new RuntimeException("There are no periods with exams in multiple rooms");
+        return null;
     }
 }

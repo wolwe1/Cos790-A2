@@ -1,5 +1,8 @@
 package u17112631;
 
+import genalg.GenAlg;
+import initialsoln.InitialSoln;
+import problemdomain.ProblemDomain;
 import u17112631.dto.constraints.hardConstraints.interfaces.IHardConstraint;
 import u17112631.dto.primitives.ExamProblemSet;
 import u17112631.helpers.ExamFileReader;
@@ -14,9 +17,11 @@ import u17112631.infrastructure.implementation.selectors.RandomHeuristicSelector
 import u17112631.infrastructure.interfaces.IHeuristicSelecter;
 import u17112631.infrastructure.interfaces.IMoveAccepter;
 import u17112631.infrastructure.interfaces.IScheduleCreator;
+import u17112631.link.OurProblemDomain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 
@@ -84,49 +89,121 @@ public class Main {
     public static void main(String[] args) throws Exception {
         ExamFileReader reader;
         ExamProblemSet problemSet;
-        SinglePointSelectionPerturbativeSearch singlePoint;
 
-        for (String set : sets) {
-            System.out.println("Set: " + set);
-            reader = new ExamFileReader(solutionFileBase + "exam_comp_set"+set+".exam");
-            problemSet = reader.CreateProblemSetFromFile();
+        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+        System.out.println("Single point or multipoint? {1: single, 2: multi}");
 
-            for (String acceptor : acceptors) {
-                for (String selector : selectors) {
-                    System.out.println(acceptor + " - " + selector);
-                    singlePoint = singlePointSetup(Integer.parseInt(set),problemSet,acceptor,selector);
-                    RunStatistics runStatistics = singlePoint.run();
-                    runStatistics.print();
-                    System.out.println("=======================================================");
+        String userInput = myObj.nextLine();
+
+        if(Integer.parseInt(userInput) == 1){
+            SinglePointSelectionPerturbativeSearch singlePoint;
+
+            List<RunStatistics> bestPerformersForEachSet = new ArrayList<>();
+
+            System.out.println("Please enter the number of runs per set:");
+            userInput = myObj.nextLine();
+            int NUMRUNS = Integer.parseInt(userInput);
+
+            for (String set : sets) {
+                System.out.println("Set: " + set);
+                reader = new ExamFileReader(solutionFileBase + "exam_comp_set"+set+".exam");
+                problemSet = reader.CreateProblemSetFromFile();
+
+                //Best performer from run
+                RunStatistics best = null;
+
+                for (int i = 0; i < NUMRUNS; i++) {
+                    System.out.println("run "+ i);
+                    for (String acceptor : acceptors) {
+                        for (String selector : selectors) {
+                            //System.out.println(acceptor + " - " + selector);
+                            singlePoint = singlePointSetup(i,problemSet,acceptor,selector);
+                            RunStatistics runStatistics = singlePoint.run();
+                            runStatistics.addType(acceptor + " - " + selector);
+                            runStatistics.addSeed(i);
+                            //runStatistics.print();
+                            //System.out.println("=======================================================");
+
+                            if(best == null || runStatistics.getBestFitness() < best.getBestFitness()){
+                                best = runStatistics;
+                            }
+                        }
+                    }
                 }
+                bestPerformersForEachSet.add(best);
             }
 
-        }
+            for (RunStatistics setBest : bestPerformersForEachSet) {
+                setBest.print();
+            }
+        }else{
+            List<RunStatistics> bestInSets = new ArrayList<>();
 
-//        long seed = 2;
-//        String possibleHeuristics=new String("lew");
-//
-//        //Create the genetic algorithm and set parameters
-//        GenAlg geneticAlgorithm = new CustomGenAlg(seed,possibleHeuristics);
-//        geneticAlgorithm.setPopulationSize(50);
-//        geneticAlgorithm.setTournamentSize(3);
-//        geneticAlgorithm.setNoOfGenerations(15);
-//        geneticAlgorithm.setMutationRate(0.3);
-//        geneticAlgorithm.setCrossoverRate(0.3);
-//        geneticAlgorithm.setInitialMaxLength(problem.getHeuristicComboLength());
-//        geneticAlgorithm.setOffspringMaxLength(problem.getHeuristicComboLength());
-//        geneticAlgorithm.setMutationLength(2);
-//
-//
-//        geneticAlgorithm.setProblem(problem);
-//
-//        InitialSoln solution = geneticAlgorithm.evolve();
-//
-//        System.out.println("Best Solution");
-//        System.out.println("--------------");
-//        System.out.println("Fitness: "+solution.getFitness());
-//        System.out.println("Heuristic combination: "+solution.getHeuCom());
-//        System.out.println("Solution: ");
-//        displaySolution(solution.getSoln());
+            System.out.println("Please enter the number of runs per set:");
+            userInput = myObj.nextLine();
+            int NUMRUNS = Integer.parseInt(userInput);
+
+            System.out.println("Please enter the population size:");
+            userInput = myObj.nextLine();
+            int POPSIZE = Integer.parseInt(userInput);
+
+            System.out.println("Please enter the number of generations per run:");
+            userInput = myObj.nextLine();
+            int NUMGENS = Integer.parseInt(userInput);
+
+            for (String set : sets) {
+                System.out.println("\nSet: " + set);
+                //Setup
+                reader = new ExamFileReader(solutionFileBase + "exam_comp_set"+set+".exam");
+                problemSet = reader.CreateProblemSetFromFile();
+
+                HardConstraintCalculator validator = getHardConstraintValidator(problemSet);
+                SoftConstraintCalculator fitnessFunction = new SoftConstraintCalculator(problemSet.getSoftConstraints());
+                IScheduleCreator creator = new FirstFitCreator(problemSet,validator);
+                OurProblemDomain ourProblemDomain = new OurProblemDomain(creator,validator,fitnessFunction);
+
+                double startFitness = fitnessFunction.getFitness(ourProblemDomain.initialSchedule);
+                RunStatistics bestForSet = new RunStatistics();
+                bestForSet.addBestFitness(Double.POSITIVE_INFINITY);
+
+                //Run
+                for (int i = 0; i < NUMRUNS; i++) {
+                    GenAlg geneticAlgorithm = new GenAlg(i,"abcd");
+
+                    geneticAlgorithm.setPopulationSize(POPSIZE);
+                    geneticAlgorithm.setTournamentSize(2);
+                    geneticAlgorithm.setNoOfGenerations(NUMGENS);
+                    geneticAlgorithm.setMutationRate(0.2);
+                    geneticAlgorithm.setCrossoverRate(0.6);
+                    geneticAlgorithm.setInitialMaxLength(15);
+                    geneticAlgorithm.setOffspringMaxLength(35);
+                    geneticAlgorithm.setMutationLength(2);
+                    geneticAlgorithm.setPrint(false);
+                    geneticAlgorithm.setProblem(ourProblemDomain);
+
+                    long startTime = System.currentTimeMillis();
+                    InitialSoln solution = geneticAlgorithm.evolve();
+                    long endTime = System.currentTimeMillis();
+                    long duration = endTime - startTime;
+
+                    RunStatistics runStat = new RunStatistics();
+                    runStat.setStartingFitness(startFitness);
+                    runStat.addBestPerformer(solution.getHeuCom());
+                    runStat.addRunDuration(duration);
+                    runStat.addSeed(i);
+                    runStat.addBestFitness(solution.getFitness());
+
+                    if(bestForSet.getBestFitness() > runStat.getBestFitness())
+                        bestForSet = runStat;
+
+                }
+                bestInSets.add(bestForSet);
+
+            }
+
+            for (RunStatistics bestInSet : bestInSets) {
+                bestInSet.print();
+            }
+        }
     }
 }

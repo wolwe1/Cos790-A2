@@ -272,7 +272,7 @@ public class FirstFitCreator implements IScheduleCreator {
 
     private Room getFirstRoomToFitExam(Period period, Exam exam) {
 
-        List<Room> rooms = period.getRooms();
+        Set<Room> rooms = period.getRooms();
 
         for (Room room : rooms) {
             if (room.canFitExam(exam) && room.hasNoStudentConflict(exam) && scheduleValidator.willNotViolateConstraint(room,exam) )

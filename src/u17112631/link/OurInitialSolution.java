@@ -11,12 +11,20 @@ package u17112631.link;
 //Import statements
 
 import initialsoln.InitialSoln;
+import u17112631.dto.primitives.ExamSchedule;
+import u17112631.infrastructure.heuristics.*;
+import u17112631.infrastructure.implementation.HardConstraintCalculator;
+import u17112631.infrastructure.implementation.SoftConstraintCalculator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //For selective constructive, the solution must create a complete timetable
 //No hard constraints must be violated and the fitness will be soft contraints met
 public class OurInitialSolution extends InitialSoln
 {
-/******************************************************************************/
+
+    /******************************************************************************/
  //Data elements
     
  //Stores the heuristic combination that will be used to create an initial
@@ -39,6 +47,18 @@ public class OurInitialSolution extends InitialSoln
     //ExamTimeTablingSolution _solution;
     //ExamProblemSet _problemSet;
 
+    //Problem Specific items
+    List<PerturbativeHeuristic> thisSolutionsHeuristics;
+    HardConstraintCalculator validator;
+    SoftConstraintCalculator fitnessFunction;
+    ExamSchedule schedule;
+
+    public OurInitialSolution(HardConstraintCalculator validator, SoftConstraintCalculator fitnessFunction, ExamSchedule schedule){
+        this.validator = validator;
+        this.fitnessFunction = fitnessFunction;
+        this.schedule = schedule;
+        this.thisSolutionsHeuristics = new ArrayList<>();
+    }
 /*****************************************************************************/
 
 /**Implementation of abstract methods needed to extend InitialSoln***/
@@ -57,6 +77,28 @@ public class OurInitialSolution extends InitialSoln
    //create an initial solution.
      
    this._heuristicComb =heuristicComb;
+   this.thisSolutionsHeuristics.clear();
+
+     for (int i = 0; i < _heuristicComb.length(); i++){
+         char c = _heuristicComb.charAt(i);
+         String heuristicId =Character.toString(c);
+
+         //Process char
+         switch (heuristicId){
+             case "a" :
+                 this.thisSolutionsHeuristics.add(new RoomChangeHeuristic());
+                 break;
+             case "b" :
+                 this.thisSolutionsHeuristics.add(new RoomSwapHeuristic());
+                 break;
+             case "c" :
+                 this.thisSolutionsHeuristics.add(new PeriodChangeHeuristic());
+                 break;
+             case "d" :
+                 this.thisSolutionsHeuristics.add(new PeriodSwapHeuristic());
+                 break;
+         }
+     }
  }
 /*****************************************************************************/
 
@@ -84,13 +126,8 @@ public String getSoln()
  {
    //This method is used to compare two initial solutions to determine which of
    //the two is fitter. 
-     
-   if(other.getFitness() < _fitness)
-    return -1;
-   else if (other.getFitness() > _fitness)
-    return 1;
-   else
-    return 0;
+
+     return Double.compare(other.getFitness(), _fitness);
  }
 /*****************************************************************************/
 
@@ -103,29 +140,21 @@ public String getSoln()
    
    //Construct a solution to the problem using the heuristic combination.
 
+   _solutionName =  _heuristicComb;
 
-   _solutionName ="Solution created using heuristic combo : " + _heuristicComb;
+     for (PerturbativeHeuristic heuristic : this.thisSolutionsHeuristics) {
 
+         //Select a starting heuristic
+         heuristic.setSchedule(schedule);
 
-//   _solution = new ExamTimeTablingSolution(_problemSet,_heuristicComb);
-//     try {
-//         _solution.SolveProblem();
-//     } catch (Exception e) {
-//         e.printStackTrace();
-//         System.out.println(e.getMessage());
-//     }
-//     _fitness = _solution.GetFitness();
+         heuristic.makeChange();
+
+     }
+
+     if(validator.validatesConstraints(schedule))
+         _fitness = Double.POSITIVE_INFINITY;
+     else{
+         _fitness = fitnessFunction.getFitness(schedule);
+     }
  }
-
-    //public void setProblemSet(IProblemSet problemSet) {
-    // _problemSet = (ExamProblemSet) problemSet;
-    //}
-
-    //public void print() {
-    // _solution.PrintSolution();
-    //}
-
-    //public int getProblemSetSize(){
-    // return _problemSet.get_exams().size();
-    //}
 }
