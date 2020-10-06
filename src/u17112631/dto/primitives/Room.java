@@ -159,4 +159,13 @@ public class Room {
         var studentsAlreadyInPeriod = getStudents();
         return !exam.hasStudents(studentsAlreadyInPeriod);
     }
+
+    public Exam getExams(int examNumber) {
+        for (Exam exam : exams) {
+            if(exam.getExamNumber() == examNumber)
+                return exam;
+        }
+
+        throw new RuntimeException("Exam does not exist in room");
+    }
 }

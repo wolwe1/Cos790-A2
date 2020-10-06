@@ -79,7 +79,7 @@ public abstract class PerturbativeHeuristic {
 
         int examOne = numGen.nextInt(numExamsInPeriod);
 
-        return chosenPeriod.getExam(examOne);
+        return chosenPeriod.getExamByIndex(examOne);
     }
 
     /**
@@ -243,5 +243,20 @@ public abstract class PerturbativeHeuristic {
         int roomTwoCapacityWithoutExam = roomTwo.getCapacity() + secondExam.getNumberOfStudents();
 
         return secondExam.getNumberOfStudents() <= roomOneCapacityWithoutExam && firstExam.getNumberOfStudents() <= roomTwoCapacityWithoutExam;
+    }
+
+    protected Room pickRoomWithExams(Period period, List<Room> unsuitableRooms) {
+        var rooms = period.getRooms();
+        int chosenRoom = numGen.nextInt(rooms.size());
+
+        while (unsuitableRooms.contains(rooms.get(chosenRoom)) || rooms.get(chosenRoom).getNumberOfExams() == 0){
+            rooms.remove(rooms.get(chosenRoom));
+
+            if(rooms.size() == 0) return null;
+
+            chosenRoom = numGen.nextInt(rooms.size());
+        }
+
+        return rooms.get(chosenRoom);
     }
 }

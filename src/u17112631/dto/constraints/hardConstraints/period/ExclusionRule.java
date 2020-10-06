@@ -39,12 +39,17 @@ public class ExclusionRule implements IPeriodHardConstraintRule {
 
     @Override
     public boolean willCreateViolation(Period periodWithConstraint, Period periodBeingMovedTo) {
-        return !periodBeingMovedTo.equals(periodWithConstraint);
+        return periodBeingMovedTo.equals(periodWithConstraint);
     }
 
     @Override
     public List<Exam> setPriority(Exam nextExamToSchedule, Exam otherExam) {
         return Arrays.asList(nextExamToSchedule,otherExam);
+    }
+
+    @Override
+    public boolean isSetFirst(Exam exam) {
+        throw new RuntimeException("This method should not be called");
     }
 
     public Period getPeriodWithConstrainedExam(ExamSchedule schedule, int examNumber){

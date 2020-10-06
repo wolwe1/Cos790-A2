@@ -16,4 +16,6 @@ public interface IHardConstraint {
     boolean usesRule(String ruleName);
 
     List<Exam> setPriority(Exam nextExamToSchedule, Exam otherExam);
+
+    boolean isSetFirst(Exam nextExamToSchedule);
 }

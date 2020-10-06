@@ -59,6 +59,11 @@ public class PeriodHardConstraint implements IHardConstraint {
     }
 
     @Override
+    public boolean isSetFirst(Exam exam) {
+        return _rule.isSetFirst(exam);
+    }
+
+    @Override
     public boolean containsViolation(ExamSchedule schedule) {
         return _rule.containsViolation(schedule);
     }

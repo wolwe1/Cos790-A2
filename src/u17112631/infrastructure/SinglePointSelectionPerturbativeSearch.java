@@ -1,5 +1,6 @@
 package u17112631.infrastructure;
 
+import u17112631.helpers.RunStatistics;
 import u17112631.infrastructure.interfaces.IMoveAccepter;
 import u17112631.infrastructure.heuristics.PerturbativeHeuristic;
 import u17112631.dto.primitives.ExamSchedule;
@@ -18,7 +19,7 @@ public class SinglePointSelectionPerturbativeSearch {
         this.scheduleCreator = creator;
     }
 
-    public String run(){
+    public RunStatistics run(){
 
         StringBuilder heuristicCombination = new StringBuilder();
 
@@ -26,7 +27,13 @@ public class SinglePointSelectionPerturbativeSearch {
         ExamSchedule bestSchedule = scheduleCreator.createSchedule();
         //Set the baseline for the move accepter
         moveAccepter.setSchedule(bestSchedule.getCopy());
-        System.out.println("Initial solution fitness: " + moveAccepter.getScheduleFitness());
+
+        //Stats
+        double startingFitness = moveAccepter.getScheduleFitness();
+        RunStatistics statistics = new RunStatistics();
+        statistics.setStartingFitness(startingFitness);
+        System.out.println("Initial solution fitness: " + startingFitness);
+        long startTime = System.currentTimeMillis();
 
         while (heuristicSelector.hasNext()) {
 
@@ -42,11 +49,15 @@ public class SinglePointSelectionPerturbativeSearch {
                 bestSchedule = heuristic.getSchedule();
                 //Reset the selector
                 heuristicSelector.reset();
-
             }
         }
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        statistics.addRunDuration(duration);
+        statistics.addBestPerformer(heuristicCombination.toString());
+        statistics.addBestFitness(moveAccepter.getScheduleFitness());
 
         System.out.println("Best performing heuristic combination fitness: " + moveAccepter.getScheduleFitness());
-        return heuristicCombination.toString();
+        return statistics;
     }
 }

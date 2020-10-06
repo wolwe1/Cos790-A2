@@ -62,4 +62,29 @@ public class ExamSchedule {
     public ExamSchedule getCopy() {
         return new ExamSchedule(this);
     }
+
+    public Period isScheduled(Exam exam) {
+
+        for (Period period : periods) {
+            if(period.containsExam(exam))
+                return period;
+        }
+        return null;
+    }
+
+    public Exam getExam(int examNumber) {
+        for (Period period : periods) {
+            if(period.containsExam(examNumber))
+                return period.getExam(examNumber);
+        }
+        return null;
+    }
+
+    public Period getPeriodWithExam(int examNumber) {
+        for (Period period : periods) {
+            if(period.containsExam(examNumber))
+                return period;
+        }
+        return null;
+    }
 }

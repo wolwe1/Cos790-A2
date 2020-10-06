@@ -20,37 +20,41 @@ public class RoomSwapHeuristic extends PerturbativeHeuristic {
         List<Period> unsuitablePeriods = new ArrayList<>();
         List<Room> unsuitableRooms = new ArrayList<>();
 
-        Period chosenPeriod = pickPeriodWithAnExamInMultipleRooms();
-        unsuitablePeriods.add(chosenPeriod);
-
         while (unsuitablePeriods.size() != schedule.getPeriods().size()){
+            Period chosenPeriod = pickPeriodWithAnExamInMultipleRooms(unsuitablePeriods);
+            unsuitablePeriods.add(chosenPeriod);
+
             Room roomOne = pickRoom(chosenPeriod);
             unsuitableRooms.add(roomOne);
 
-            Room roomTwo = pickRoom(chosenPeriod,unsuitableRooms);
+            while (unsuitableRooms.size() != chosenPeriod.getNumberOfRooms()){
+                Room roomTwo = pickRoom(chosenPeriod,unsuitableRooms);
 
-            Exam examOne = pickExam(roomOne);
-            Exam examTwo = pickExam(roomTwo);
+                Exam examOne = pickExam(roomOne);
+                Exam examTwo = pickExam(roomTwo);
 
-            if(examOne == null || examTwo == null)
-                continue;
+                if(examOne != null && examTwo != null){
+                    if(canSwap(roomOne,roomTwo,examOne,examTwo)){
+                        roomOne.replace(examOne,examTwo);
+                        roomTwo.replace(examTwo,examOne);
 
-            if(canSwap(roomOne,roomTwo,examOne,examTwo)){
-                roomOne.replace(examOne,examTwo);
-                roomTwo.replace(examTwo,examOne);
+                        chosenPeriod.updateRoom(roomOne);
+                        chosenPeriod.updateRoom(roomTwo);
 
-                chosenPeriod.updateRoom(roomOne);
-                chosenPeriod.updateRoom(roomTwo);
-
-                schedule.updatePeriod(chosenPeriod);
-                return;
+                        schedule.updatePeriod(chosenPeriod);
+                        return;
+                    }
+                }
+                unsuitableRooms.add(roomTwo);
             }
+            unsuitablePeriods.add(chosenPeriod);
+            unsuitableRooms.clear();
+
         }
     }
 
-    private Period pickPeriodWithAnExamInMultipleRooms() {
-
-        List<Period> unusablePeriods = new ArrayList<>();
+    private Period pickPeriodWithAnExamInMultipleRooms(List<Period> unsuitablePeriods) {
+        List<Period> unusablePeriods = new ArrayList<>(unsuitablePeriods);
 
         while (unusablePeriods.size() != schedule.getPeriods().size()){
 
@@ -63,6 +67,4 @@ public class RoomSwapHeuristic extends PerturbativeHeuristic {
         }
         throw new RuntimeException("There are no periods with exams in multiple rooms");
     }
-
-
 }

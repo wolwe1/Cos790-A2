@@ -45,6 +45,11 @@ public class RoomHardConstraint implements IHardConstraint {
         return Arrays.asList(nextExamToSchedule,otherExam);
     }
 
+    @Override
+    public boolean isSetFirst(Exam nextExamToSchedule) {
+        throw new RuntimeException("This method should not be called");
+    }
+
     public boolean moveWillViolateConstraint(Room room, Exam exam) {
         return _rule.moveWillViolateConstraint(room,exam);
     }

@@ -10,4 +10,6 @@ public interface IPeriodHardConstraintRule extends IHardConstraintRule {
     boolean willCreateViolation(Period periodWithConstraint, Period periodBeingMovedTo);
 
     List<Exam> setPriority(Exam nextExamToSchedule, Exam otherExam);
+
+    boolean isSetFirst(Exam exam);
 }

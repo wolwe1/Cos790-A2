@@ -51,9 +51,9 @@ public class AfterRule implements IPeriodHardConstraintRule {
     public boolean willCreateViolation(Period periodWithConstraint, Period periodBeingMovedTo) {
 
         if(periodWithConstraint.containsExam(examOne))
-            return periodBeingMovedTo.getPeriodNumber() < periodWithConstraint.getPeriodNumber();
+            return periodBeingMovedTo.getPeriodNumber() >= periodWithConstraint.getPeriodNumber();
         else
-            return periodBeingMovedTo.getPeriodNumber() > periodWithConstraint.getPeriodNumber();
+            return periodBeingMovedTo.getPeriodNumber() <= periodWithConstraint.getPeriodNumber();
 
     }
 
@@ -72,5 +72,10 @@ public class AfterRule implements IPeriodHardConstraintRule {
         }
 
         return swappedMembers;
+    }
+
+    @Override
+    public boolean isSetFirst(Exam exam) {
+        return exam.getExamNumber() == examTwo;
     }
 }

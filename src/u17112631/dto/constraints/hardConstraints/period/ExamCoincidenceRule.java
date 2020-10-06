@@ -4,7 +4,6 @@ import u17112631.dto.constraints.hardConstraints.interfaces.IPeriodHardConstrain
 import u17112631.dto.primitives.Exam;
 import u17112631.dto.primitives.ExamSchedule;
 import u17112631.dto.primitives.Period;
-import u17112631.dto.primitives.Room;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,16 @@ public class ExamCoincidenceRule implements IPeriodHardConstraintRule {
 
         for (Period period : schedule.getPeriods()) {
             if(period.containsExam(examOne)){
-                return !period.containsExam(examTwo);
+                if(period.containsExam(examTwo))
+                    return false;
+                else{
+                    Exam firstExam = period.getExam(examOne);
+                    Exam secondExam = schedule.getExam(examTwo);
+
+                    if(secondExam == null) throw new RuntimeException("Exam does not exist in schedule");
+
+                    return !firstExam.hasStudents(secondExam.getStudents());
+                }
             }
         }
         throw new RuntimeException("Constraint not found");
@@ -48,6 +56,11 @@ public class ExamCoincidenceRule implements IPeriodHardConstraintRule {
     @Override
     public List<Exam> setPriority(Exam nextExamToSchedule, Exam otherExam) {
         return Arrays.asList(nextExamToSchedule,otherExam);
+    }
+
+    @Override
+    public boolean isSetFirst(Exam exam) {
+        throw new RuntimeException("This method should not be called");
     }
 
     public Period getPeriodWithConstrainedExam(ExamSchedule schedule, int examNumber){

@@ -13,16 +13,19 @@ public class Period {
     private final int penalty;
     private final int periodNumber;
     private List<Room> rooms;
+    private int numberOfExams;
+    private Set<Student> studentsInPeriod;
 
     public Period(String period, int periodNumber) throws ParseException {
         String[] info = period.split(",");
 
-        date = new SimpleDateFormat("dd:MM:yy HH:mm:ss").parse(info[0] + info[1]);
-        duration = Integer.parseInt(info[2].strip());
-        penalty = Integer.parseInt(info[3].strip());
+        this.date = new SimpleDateFormat("dd:MM:yy HH:mm:ss").parse(info[0] + info[1]);
+        this.duration = Integer.parseInt(info[2].strip());
+        this.penalty = Integer.parseInt(info[3].strip());
         this.periodNumber = periodNumber;
-        rooms = new ArrayList<>();
-
+        this.rooms = new ArrayList<>();
+        this.numberOfExams = 0;
+        this.studentsInPeriod = new HashSet<>();
     }
 
     protected Period(Period other){
@@ -31,6 +34,8 @@ public class Period {
         this.penalty = other.penalty;
         this.periodNumber = other.periodNumber;
         this.rooms = other.getRooms();
+        numberOfExams = 0;
+        this.studentsInPeriod = new HashSet<>(other.studentsInPeriod);
     }
 
     public int getPenalty() {
@@ -52,6 +57,12 @@ public class Period {
 
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+
+        int numExams = 0;
+        for (Room room : rooms) {
+            numExams += room.getNumberOfExams();
+        }
+        numberOfExams = numExams;
     }
 
     public int getMaxRoomCapacity() {
@@ -95,19 +106,6 @@ public class Period {
         return totalExams;
     }
 
-    public void replaceExam(Exam examOne, Exam examTwo) {
-
-        Room roomOne = findRoomWithExam(examOne);
-        Room roomTwo = findRoomWithExam(examTwo);
-
-        if(roomOne.getRoomNumber() == roomTwo.getRoomNumber()){
-            roomOne.swap(examOne,examTwo);
-        }else{
-            roomOne.replace(examOne,examTwo);
-            roomTwo.replace(examTwo,examOne);
-        }
-    }
-
     private Room findRoomWithExam(Exam exam) {
 
         for (Room room : rooms) {
@@ -119,7 +117,7 @@ public class Period {
     }
 
 
-    public Exam getExam(int examIndex) {
+    public Exam getExamByIndex(int examIndex) {
 
         int previousExams = 0;
 
@@ -132,6 +130,15 @@ public class Period {
         }
 
         throw new RuntimeException("Period does not contain exam index");
+    }
+
+    public Exam getExam(int examNumber){
+        for (Room room : rooms) {
+            if(room.containsExam(examNumber))
+                return room.getExams(examNumber);
+        }
+
+        throw new RuntimeException("Exam does not exist in period");
     }
 
     public int getNumberOfRooms() {
@@ -150,6 +157,12 @@ public class Period {
         int roomIndex = getRoomIndex(updatedRoom);
 
         this.rooms.set(roomIndex,updatedRoom);
+
+        int numExams = 0;
+        for (Room room : rooms) {
+            numExams += room.getNumberOfExams();
+        }
+        numberOfExams = numExams;
     }
 
     public int getRoomIndex(Room room){
@@ -240,5 +253,9 @@ public class Period {
     public boolean hasNoStudentConflict(Exam exam) {
         var studentsAlreadyInPeriod = getStudents();
         return !exam.hasStudents(studentsAlreadyInPeriod);
+    }
+
+    public boolean containsExam(Exam exam) {
+        return containsExam(exam.getExamNumber());
     }
 }
